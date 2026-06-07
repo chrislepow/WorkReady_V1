@@ -1,0 +1,139 @@
+.practiceDrill {
+  margin-top: 20px;
+}
+
+.drillToolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 39px;
+  border-radius: 5px;
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+.primaryAction {
+  border: 0;
+  background: #1f66e5;
+  color: #ffffff;
+  box-shadow: 0 3px 5px rgba(17, 24, 39, 0.2);
+}
+
+.secondaryAction {
+  border: 1px solid #e3e6eb;
+  background: #ffffff;
+  color: #111827;
+}
+
+.drillList {
+  display: flex;
+  max-height: 690px;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.drillRow {
+  display: grid;
+  grid-template-columns: 1fr 260px 155px;
+  align-items: center;
+  gap: 18px;
+  min-height: 116px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 18px 20px;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(17, 24, 39, 0.14);
+}
+
+.drillRowCorrect {
+  border-color: #bde5c8;
+}
+
+.drillRowMissed {
+  border-color: #ffcbc6;
+}
+
+.drillPrompt span,
+.drillRow label span {
+  display: block;
+  color: #777777;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.drillPrompt strong {
+  display: block;
+  margin-top: 6px;
+  color: #111827;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.drillPrompt p {
+  margin: 7px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.drillRow input {
+  width: 260px;
+  height: 42px;
+  margin-top: 7px;
+  border: 1px solid #d6dbe4;
+  border-radius: 6px;
+  padding: 0 12px;
+  color: #111827;
+  font-size: 16px;
+}
+
+.resultPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  border-radius: 5px;
+  padding: 8px 11px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.resultPillCorrect {
+  background: #eefbf2;
+  color: #2f8c4b;
+}
+
+.resultPillMissed {
+  background: #fff1ef;
+  color: #b42318;
+}
+
+@media (max-width: 1160px) {
+  .drillRow {
+    grid-template-columns: 1fr;
+  }
+
+  .drillRow input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 470px) {
+  .drillList {
+    padding-right: 0;
+  }
+}

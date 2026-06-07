@@ -45,13 +45,11 @@ describe("WordReadyApp", () => {
     await user.click(masteredButton);
 
     expect(masteredButton).toHaveAttribute("aria-pressed", "true");
-    expect(masteredButton).toHaveClass("active");
     expect(trickyButton).toHaveAttribute("aria-pressed", "false");
 
     await user.click(trickyButton);
 
     expect(trickyButton).toHaveAttribute("aria-pressed", "true");
-    expect(trickyButton).toHaveClass("active");
     expect(masteredButton).toHaveAttribute("aria-pressed", "false");
   });
 

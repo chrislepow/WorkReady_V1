@@ -1,6 +1,6 @@
 import { DashboardStats } from "@/lib/wordready";
-
 import { StatCard } from "./StatCard";
+import styles from "./AppHeader.module.css";
 
 type AppHeaderProps = {
   stats: DashboardStats;
@@ -8,13 +8,13 @@ type AppHeaderProps = {
 
 export function AppHeader({ stats }: AppHeaderProps) {
   return (
-    <header className="app-header">
-      <div className="app-title">
+    <header className={styles.appHeader}>
+      <div className={styles.appTitle}>
         <h1>Spelling Practice</h1>
         <p>Practice your words and track your practice</p>
       </div>
 
-      <div className="stats-grid" aria-label="Practice stats">
+      <div className={styles.statsGrid} aria-label="Practice stats">
         <StatCard
           accent="target"
           label="Words to Learn"

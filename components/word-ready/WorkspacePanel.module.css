@@ -1,0 +1,50 @@
+.workspacePanel {
+  min-height: 904px;
+  border: 1px solid #e9e9e9;
+  border-radius: 11px;
+  padding: 18px 20px 21px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.workspaceDivider {
+  height: 1px;
+  margin: 20px 0 19px;
+  background: #e7e7e7;
+}
+
+.wordCountBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  width: 147px;
+  height: 44px;
+  border-left: 4px solid #d8d8d8;
+  border-radius: 3px;
+  padding-left: 20px;
+  background: #f3f7ff;
+  color: #2f5f9f;
+}
+
+.wordCountBadge strong {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 36px;
+}
+
+.wordCountBadge span {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .workspacePanel {
+    min-height: 680px;
+  }
+}
+
+@media (max-width: 470px) {
+  .workspacePanel {
+    padding: 14px;
+  }
+}

@@ -1,0 +1,93 @@
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 143px;
+  height: 86px;
+  border-left: 4px solid #d8dce3;
+  background: #f5f8ff;
+}
+
+.statValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.statCard strong {
+  display: block;
+  font-size: 31px;
+  font-weight: 500;
+  line-height: 34px;
+}
+
+.statIcon {
+  display: block;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.statLabel {
+  display: block;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.target {
+  color: #2f5f9f;
+}
+
+.target .statIcon {
+  color: #ba1e24;
+  -webkit-mask-image: url("../../assets/bullseye-solid-full.svg");
+  mask-image: url("../../assets/bullseye-solid-full.svg");
+}
+
+.brain {
+  background: #effaf2;
+  color: #409859;
+}
+
+.brain .statIcon {
+  -webkit-mask-image: url("../../assets/brain-solid-full.svg");
+  mask-image: url("../../assets/brain-solid-full.svg");
+}
+
+.streak {
+  background: #f6f0ff;
+  color: #8b65cf;
+}
+
+.streak .statIcon {
+  color: #cc714d;
+  -webkit-mask-image: url("../../assets/fire-solid-full.svg");
+  mask-image: url("../../assets/fire-solid-full.svg");
+}
+
+.accuracy {
+  background: #fff8ea;
+  color: #b4812d;
+}
+
+.accuracy .statIcon {
+  -webkit-mask-image: url("../../assets/trophy-solid-full.svg");
+  mask-image: url("../../assets/trophy-solid-full.svg");
+}
+
+@media (max-width: 650px) {
+  .statCard {
+    width: 100%;
+  }
+}

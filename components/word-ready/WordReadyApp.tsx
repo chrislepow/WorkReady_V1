@@ -13,13 +13,13 @@ import {
   normalizeWord,
   parseWords,
   PracticeMode,
-  SAMPLE_WORDS,
   STORAGE_KEYS,
   buildPracticeItems,
 } from "@/lib/wordready";
 
 import { AppHeader } from "./AppHeader";
 import { BrandPanel } from "./BrandPanel";
+import styles from "./WordReadyApp.module.css";
 import { WorkspacePanel } from "./WorkspacePanel";
 
 export default function WordReadyApp() {
@@ -124,10 +124,6 @@ export default function WordReadyApp() {
     setMasteredWords([]);
   }
 
-  function useSampleWords() {
-    handleWordsChange(SAMPLE_WORDS.join("\n"));
-  }
-
   function markTricky(word: string) {
     const key = normalizeWord(word);
 
@@ -186,7 +182,7 @@ export default function WordReadyApp() {
   }
 
   return (
-    <main className="wordready-shell">
+    <main className={styles.shell}>
       <BrandPanel
         daysUntilTest={daysUntilTest}
         onClearWords={clearWords}
@@ -196,7 +192,7 @@ export default function WordReadyApp() {
         wordText={wordText}
       />
 
-      <div className="practice-area">
+      <div className={styles.practiceArea}>
         <AppHeader stats={stats} />
         <WorkspacePanel
           activeMode={activeMode}
@@ -209,7 +205,6 @@ export default function WordReadyApp() {
           onModeChange={switchMode}
           onResetPractice={resetPractice}
           onUpdateAnswer={updateAnswer}
-          onUseSampleWords={useSampleWords}
           trickyKeys={trickyKeys}
           words={words}
         />

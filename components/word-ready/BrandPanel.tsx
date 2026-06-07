@@ -2,6 +2,8 @@ import { BookOpen, CalendarDays, ChevronDown, ChevronUp, Minus, Plus } from "luc
 
 import { MAX_DAYS, MIN_DAYS, PlanItem } from "@/lib/wordready";
 
+import styles from "./BrandPanel.module.css";
+
 type BrandPanelProps = {
   daysUntilTest: number;
   plan: PlanItem[];
@@ -22,21 +24,21 @@ export function BrandPanel({
   const todayPlan = plan[0];
 
   return (
-    <aside className="brand-panel" aria-label="WordReady controls">
-      <div className="brand-lockup" aria-label="Word Ready">
-        <div className="brand-word">WORD</div>
-        <div className="brand-ready">READY</div>
-        <div className="brand-rule" />
+    <aside className={styles.brandPanel} aria-label="WordReady controls">
+      <div className={styles.brandLockup} aria-label="Word Ready">
+        <div className={styles.brandWord}>WORD</div>
+        <div className={styles.brandReady}>READY</div>
+        <div className={styles.brandRule} />
         <p>Learn to spell words in less than a week</p>
       </div>
 
-      <section className="sidebar-section">
+      <section className={styles.sidebarSection}>
         <h2>
           <CalendarDays aria-hidden="true" size={23} />
           Days Until Test
         </h2>
-        <div className="days-picker">
-          <div className="days-stepper">
+        <div className={styles.daysPicker}>
+          <div className={styles.daysStepper}>
             <input
               aria-label="Days until test"
               max={MAX_DAYS}
@@ -45,7 +47,7 @@ export function BrandPanel({
               type="number"
               value={String(daysUntilTest).padStart(2, "0")}
             />
-            <div className="days-stepper-buttons">
+            <div className={styles.daysStepperButtons}>
               <button
                 aria-label="Increase days until test"
                 onClick={() => onDaysChange(daysUntilTest + 1)}
@@ -66,36 +68,36 @@ export function BrandPanel({
         </div>
       </section>
 
-      <section className="sidebar-section">
+      <section className={styles.sidebarSection}>
         <h2>
           <BookOpen aria-hidden="true" size={23} />
           Class Words
         </h2>
         <textarea
           aria-label="Class words"
-          className="word-entry"
+          className={styles.wordEntry}
           onChange={(event) => onWordTextChange(event.target.value)}
           placeholder="Start typing your words..."
           spellCheck={false}
           value={wordText}
         />
-        <button className="clear-button" onClick={onClearWords} type="button">
+        <button className={styles.clearButton} onClick={onClearWords} type="button">
           Clear
         </button>
       </section>
 
-      <section className="sidebar-section countdown-section">
+      <section className={`${styles.sidebarSection} ${styles.countdownSection}`}>
         <h2>
           <BookOpen aria-hidden="true" size={23} />
           Test Countdown
         </h2>
-        <div className="countdown-card">
-          <div className="countdown-card-top">
+        <div className={styles.countdownCard}>
+          <div className={styles.countdownCardTop}>
             <p>Plan adjusts from today to test day.</p>
             <span>{String(daysUntilTest).padStart(2, "0")} Days</span>
           </div>
 
-          <div className="countdown-controls">
+          <div className={styles.countdownControls}>
             <button
               aria-label="One fewer day"
               onClick={() => onDaysChange(daysUntilTest - 1)}
@@ -120,15 +122,15 @@ export function BrandPanel({
             </button>
           </div>
 
-          <div className="today-card">
+          <div className={styles.todayCard}>
             <span>TODAY</span>
             <strong>{todayPlan?.label ?? "Practice"}</strong>
           </div>
 
-          <ol className="countdown-plan" aria-label="Daily practice countdown">
+          <ol className={styles.countdownPlan} aria-label="Daily practice countdown">
             {plan.map((item) => (
               <li
-                className={item.mode === "mock" ? "mock-day" : undefined}
+                className={item.mode === "mock" ? styles.mockDay : undefined}
                 key={`${item.day}-${item.mode}`}
               >
                 <span>{String(item.daysLeft).padStart(2, "0")}</span>

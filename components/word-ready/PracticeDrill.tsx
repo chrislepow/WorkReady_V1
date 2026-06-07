@@ -2,6 +2,8 @@ import { CheckCircle2, ClipboardCheck, RotateCcw, XCircle } from "lucide-react";
 
 import { FeedbackStatus, PracticeItem, PracticeMode } from "@/lib/wordready";
 
+import styles from "./PracticeDrill.module.css";
+
 type PracticeDrillProps = {
   answers: Record<string, string>;
   feedback: Record<string, FeedbackStatus>;
@@ -24,25 +26,34 @@ export function PracticeDrill({
   const isMock = mode === "mock";
 
   return (
-    <div className="practice-drill">
-      <div className="drill-toolbar">
-        <button className="secondary-action" onClick={onReset} type="button">
+    <div className={styles.practiceDrill}>
+      <div className={styles.drillToolbar}>
+        <button className={styles.secondaryAction} onClick={onReset} type="button">
           <RotateCcw aria-hidden="true" size={17} />
           Reset
         </button>
-        <button className="primary-action" onClick={onGrade} type="button">
+        <button className={styles.primaryAction} onClick={onGrade} type="button">
           <ClipboardCheck aria-hidden="true" size={17} />
           {isMock ? "Grade Test" : "Check Answers"}
         </button>
       </div>
 
-      <div className="drill-list">
+      <div className={styles.drillList}>
         {items.map((item, index) => {
           const status = feedback[item.id];
 
           return (
-            <article className={`drill-row ${status ? `drill-row-${status}` : ""}`} key={item.id}>
-              <div className="drill-prompt">
+            <article
+              className={[
+                styles.drillRow,
+                status === "correct" ? styles.drillRowCorrect : "",
+                status === "missed" ? styles.drillRowMissed : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              key={item.id}
+            >
+              <div className={styles.drillPrompt}>
                 <span>{isMock ? `TEST WORD ${index + 1}` : `PRACTICE WORD ${index + 1}`}</span>
                 <strong>{item.prompt}</strong>
                 {item.helper ? <p>{item.helper}</p> : null}
@@ -61,7 +72,12 @@ export function PracticeDrill({
               </label>
 
               {status ? (
-                <div className={`result-pill result-pill-${status}`}>
+                <div
+                  className={[
+                    styles.resultPill,
+                    status === "correct" ? styles.resultPillCorrect : styles.resultPillMissed,
+                  ].join(" ")}
+                >
                   {status === "correct" ? (
                     <CheckCircle2 aria-hidden="true" size={16} />
                   ) : (

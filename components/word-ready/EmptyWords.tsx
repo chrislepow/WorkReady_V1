@@ -1,18 +1,13 @@
 import { BookOpen } from "lucide-react";
 
-type EmptyWordsProps = {
-  onUseSampleWords: () => void;
-};
+import styles from "./EmptyWords.module.css";
 
-export function EmptyWords({ onUseSampleWords }: EmptyWordsProps) {
+export function EmptyWords() {
   return (
-    <div className="empty-words">
+    <div className={styles.emptyWords}>
       <BookOpen aria-hidden="true" size={34} />
       <p>No words available.</p>
       <strong>Start by entering your words under “Class Words.”</strong>
-      <button onClick={onUseSampleWords} type="button">
-        Use sample words
-      </button>
     </div>
   );
 }

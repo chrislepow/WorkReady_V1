@@ -2,6 +2,8 @@ import { CheckCircle2, Info } from "lucide-react";
 
 import { normalizeWord, sentenceFor } from "@/lib/wordready";
 
+import styles from "./WordRows.module.css";
+
 type WordRowsProps = {
   masteredKeys: Set<string>;
   onMarkMastered: (word: string) => void;
@@ -18,7 +20,7 @@ export function WordRows({
   words,
 }: WordRowsProps) {
   return (
-    <div className="word-list" aria-label="Class word list">
+    <div className={styles.wordList} aria-label="Class word list">
       {words.map((word, index) => {
         const key = normalizeWord(word);
         const isMastered = masteredKeys.has(key);
@@ -26,23 +28,32 @@ export function WordRows({
 
         return (
           <article
-            className={`word-row ${isMastered ? "word-row-mastered" : ""} ${
-              isTricky ? "word-row-tricky" : ""
-            }`}
+            className={[
+              styles.wordRow,
+              isMastered ? styles.wordRowMastered : "",
+              isTricky ? styles.wordRowTricky : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             key={`${key}-${index}`}
           >
-            <div className="word-row-copy">
-              <span className="word-chip">{word}</span>
+            <div className={styles.wordRowCopy}>
+              <span className={styles.wordChip}>{word}</span>
               <p>{sentenceFor(word, index)}</p>
             </div>
 
-            <div className="word-row-actions">
+            <div className={styles.wordRowActions}>
               <span>WORD {index + 1}</span>
               <div>
                 <button
                   aria-label={`Mark ${word} mastered`}
                   aria-pressed={isMastered}
-                  className={`mastered-button ${isMastered ? "active" : ""}`}
+                  className={[
+                    styles.masteredButton,
+                    isMastered ? styles.active : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() => onMarkMastered(word)}
                   title="Mark mastered"
                   type="button"
@@ -51,7 +62,12 @@ export function WordRows({
                 </button>
                 <button
                   aria-pressed={isTricky}
-                  className={`tricky-button ${isTricky ? "active" : ""}`}
+                  className={[
+                    styles.trickyButton,
+                    isTricky ? styles.active : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() => onMarkTricky(word)}
                   type="button"
                 >

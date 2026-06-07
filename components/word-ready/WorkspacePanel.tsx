@@ -7,6 +7,7 @@ import {
 import { EmptyWords } from "./EmptyWords";
 import { PracticeDrill } from "./PracticeDrill";
 import { PracticeTabs } from "./PracticeTabs";
+import styles from "./WorkspacePanel.module.css";
 import { WordRows } from "./WordRows";
 
 type WorkspacePanelProps = {
@@ -19,7 +20,6 @@ type WorkspacePanelProps = {
   onMarkTricky: (word: string) => void;
   onModeChange: (mode: PracticeMode) => void;
   onResetPractice: () => void;
-  onUseSampleWords: () => void;
   onUpdateAnswer: (id: string, value: string) => void;
   trickyKeys: Set<string>;
   words: string[];
@@ -35,7 +35,6 @@ export function WorkspacePanel({
   onMarkTricky,
   onModeChange,
   onResetPractice,
-  onUseSampleWords,
   onUpdateAnswer,
   trickyKeys,
   words,
@@ -43,18 +42,18 @@ export function WorkspacePanel({
   const practiceItems = buildPracticeItems(activeMode, words);
 
   return (
-    <section className="workspace-panel" aria-label="Practice workspace">
+    <section className={styles.workspacePanel} aria-label="Practice workspace">
       <PracticeTabs activeMode={activeMode} onModeChange={onModeChange} />
 
-      <div className="workspace-divider" />
+      <div className={styles.workspaceDivider} />
 
-      <div className="word-count-badge" aria-label={`${words.length} words`}>
+      <div className={styles.wordCountBadge} aria-label={`${words.length} words`}>
         <strong>{words.length}</strong>
         <span>Words</span>
       </div>
 
       {words.length === 0 ? (
-        <EmptyWords onUseSampleWords={onUseSampleWords} />
+        <EmptyWords />
       ) : activeMode === "sentences" ? (
         <WordRows
           masteredKeys={masteredKeys}

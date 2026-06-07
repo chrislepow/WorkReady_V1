@@ -1,0 +1,29 @@
+.emptyWords {
+  display: flex;
+  min-height: 648px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+  text-align: center;
+}
+
+.emptyWords svg {
+  margin-bottom: 18px;
+  color: #2f5f9f;
+}
+
+.emptyWords p {
+  margin: 0;
+  color: #777777;
+  font-size: 19px;
+  line-height: 24px;
+}
+
+.emptyWords strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 24px;
+}

@@ -1,0 +1,22 @@
+.shell {
+  display: grid;
+  grid-template-columns: 292px 1fr;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.practiceArea {
+  min-width: 0;
+  padding: 30px 28px 80px;
+  background: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    display: block;
+  }
+
+  .practiceArea {
+    padding: 26px 20px 50px;
+  }
+}

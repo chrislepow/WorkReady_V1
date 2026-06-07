@@ -1,0 +1,144 @@
+.wordList {
+  display: flex;
+  max-height: 738px;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  margin-top: 20px;
+  padding: 0 18px 2px 0;
+}
+
+.wordRow {
+  display: flex;
+  min-height: 105px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 18px 19px;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(17, 24, 39, 0.14);
+}
+
+.wordRowMastered {
+  border-color: #bde5c8;
+}
+
+.wordRowTricky {
+  border-color: #ffd899;
+}
+
+.wordRowCopy {
+  min-width: 0;
+}
+
+.wordChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 109px;
+  height: 31px;
+  border-radius: 10px;
+  padding: 0 18px;
+  background: #d9e8ff;
+  color: #0067ff;
+  font-size: 16px;
+}
+
+.wordRowCopy p {
+  margin: 14px 0 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.wordRowActions {
+  display: flex;
+  min-width: 158px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.wordRowActions > span {
+  color: #777777;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.wordRowActions div {
+  display: flex;
+  gap: 8px;
+}
+
+.masteredButton,
+.trickyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
+  border: 1px solid #e3e6eb;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 3px 3px rgba(17, 24, 39, 0.17);
+}
+
+.masteredButton {
+  width: 39px;
+  color: #409859;
+}
+
+.masteredButton.active,
+.masteredButton[aria-pressed="true"] {
+  border-color: #91d7a6;
+  background: #eaf8f1;
+  color: #217a3a;
+  box-shadow:
+    inset 0 0 0 1px rgba(64, 152, 89, 0.16),
+    0 3px 3px rgba(17, 24, 39, 0.17);
+}
+
+.trickyButton {
+  gap: 7px;
+  min-width: 105px;
+  padding: 0 15px;
+  font-size: 16px;
+}
+
+.trickyButton.active,
+.trickyButton[aria-pressed="true"] {
+  border-color: #e0a316;
+  background: #fff6df;
+  color: #8a6200;
+  box-shadow:
+    inset 0 0 0 1px rgba(224, 163, 22, 0.16),
+    0 3px 3px rgba(17, 24, 39, 0.17);
+}
+
+.trickyButton svg {
+  color: #e0a316;
+  fill: #e0a316;
+}
+
+@media (max-width: 650px) {
+  .wordRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wordRowActions {
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 470px) {
+  .wordList {
+    padding-right: 0;
+  }
+}

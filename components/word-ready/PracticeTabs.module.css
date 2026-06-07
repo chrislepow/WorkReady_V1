@@ -1,0 +1,63 @@
+.practiceTabs {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+}
+
+.practiceTabs p {
+  width: 133px;
+  margin: 3px 0 0;
+  color: #111827;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.practiceTabs div {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.practiceTabs button {
+  min-width: 128px;
+  height: 41px;
+  border: 1px solid #e0e3e8;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  box-shadow: 0 3px 3px rgba(17, 24, 39, 0.18);
+}
+
+.practiceTabs button.active {
+  background: #f1f6fd;
+  box-shadow: 0 3px 3px rgba(17, 24, 39, 0.18);
+}
+
+.practiceTabs button:last-child {
+  background: #eefbf2;
+}
+
+.practiceTabs button.active:last-child {
+  background: #f1f6fd;
+}
+
+@media (max-width: 650px) {
+  .practiceTabs {
+    flex-direction: column;
+  }
+
+  .practiceTabs p {
+    width: 100%;
+  }
+
+  .practiceTabs div {
+    width: 100%;
+  }
+
+  .practiceTabs button {
+    min-width: 132px;
+    flex: 1 1 auto;
+  }
+}
