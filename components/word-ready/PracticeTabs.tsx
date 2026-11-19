@@ -3,8 +3,8 @@ import { PRACTICE_MODES, PracticeMode } from "@/lib/wordready";
 import styles from "./PracticeTabs.module.css";
 
 type PracticeTabsProps = {
-  activeMode: PracticeMode;
-  onModeChange: (mode: PracticeMode) => void;
+  readonly activeMode: PracticeMode;
+  readonly onModeChange: (mode: PracticeMode) => void;
 };
 
 export function PracticeTabs({ activeMode, onModeChange }: PracticeTabsProps) {

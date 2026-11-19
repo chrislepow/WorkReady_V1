@@ -5,13 +5,13 @@ import { FeedbackStatus, PracticeItem, PracticeMode } from "@/lib/wordready";
 import styles from "./PracticeDrill.module.css";
 
 type PracticeDrillProps = {
-  answers: Record<string, string>;
-  feedback: Record<string, FeedbackStatus>;
-  items: PracticeItem[];
-  mode: PracticeMode;
-  onGrade: () => void;
-  onReset: () => void;
-  onUpdateAnswer: (id: string, value: string) => void;
+  readonly answers: Record<string, string>;
+  readonly feedback: Record<string, FeedbackStatus>;
+  readonly items: PracticeItem[];
+  readonly mode: PracticeMode;
+  readonly onGrade: () => void;
+  readonly onReset: () => void;
+  readonly onUpdateAnswer: (id: string, value: string) => void;
 };
 
 export function PracticeDrill({

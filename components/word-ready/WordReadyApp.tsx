@@ -19,11 +19,13 @@ import {
 
 import { AppHeader } from "./AppHeader";
 import { BrandPanel } from "./BrandPanel";
+import { useWordContexts } from "./useWordContexts";
 import styles from "./WordReadyApp.module.css";
 import { WorkspacePanel } from "./WorkspacePanel";
 
 export default function WordReadyApp() {
   const [wordText, setWordText] = useState("");
+  const [isEditingWords, setIsEditingWords] = useState(false);
   const [daysUntilTest, setDaysUntilTest] = useState(5);
   const [activeMode, setActiveMode] = useState<PracticeMode>("sentences");
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -33,12 +35,13 @@ export default function WordReadyApp() {
   const [isReady, setIsReady] = useState(false);
 
   const words = useMemo(() => parseWords(wordText), [wordText]);
+  const contexts = useWordContexts(words, isEditingWords);
   const plan = useMemo(() => buildPlan(daysUntilTest), [daysUntilTest]);
   const trickyKeys = useMemo(() => new Set(trickyWords), [trickyWords]);
   const masteredKeys = useMemo(() => new Set(masteredWords), [masteredWords]);
   const practiceItems = useMemo(
-    () => buildPracticeItems(activeMode, words),
-    [activeMode, words],
+    () => buildPracticeItems(activeMode, words, contexts),
+    [activeMode, words, contexts],
   );
   const correctAnswers = Object.values(feedback).filter((status) => status === "correct").length;
   const totalAnswers = Object.keys(feedback).length;
@@ -187,6 +190,7 @@ export default function WordReadyApp() {
         daysUntilTest={daysUntilTest}
         onClearWords={clearWords}
         onDaysChange={setDays}
+        onWordEntryFocusChange={setIsEditingWords}
         onWordTextChange={handleWordsChange}
         plan={plan}
         wordText={wordText}
@@ -197,6 +201,7 @@ export default function WordReadyApp() {
         <WorkspacePanel
           activeMode={activeMode}
           answers={answers}
+          contexts={contexts}
           feedback={feedback}
           masteredKeys={masteredKeys}
           onGrade={gradePractice}
@@ -205,6 +210,7 @@ export default function WordReadyApp() {
           onModeChange={switchMode}
           onResetPractice={resetPractice}
           onUpdateAnswer={updateAnswer}
+          practiceItems={practiceItems}
           trickyKeys={trickyKeys}
           words={words}
         />

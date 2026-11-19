@@ -186,6 +186,10 @@
   color: #777777;
 }
 
+.wordEntry:not(:focus):not(:placeholder-shown) {
+  filter: blur(3px);
+}
+
 .clearButton {
   min-width: 78px;
   height: 37px;

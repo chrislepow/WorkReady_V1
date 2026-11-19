@@ -1,18 +1,20 @@
 import { CheckCircle2, Info } from "lucide-react";
 
-import { normalizeWord, sentenceFor } from "@/lib/wordready";
+import { normalizeWord, wordContextFor, type WordContexts } from "@/lib/word-context";
 
 import styles from "./WordRows.module.css";
 
 type WordRowsProps = {
-  masteredKeys: Set<string>;
-  onMarkMastered: (word: string) => void;
-  onMarkTricky: (word: string) => void;
-  trickyKeys: Set<string>;
-  words: string[];
+  readonly contexts: WordContexts;
+  readonly masteredKeys: Set<string>;
+  readonly onMarkMastered: (word: string) => void;
+  readonly onMarkTricky: (word: string) => void;
+  readonly trickyKeys: Set<string>;
+  readonly words: string[];
 };
 
 export function WordRows({
+  contexts,
   masteredKeys,
   onMarkMastered,
   onMarkTricky,
@@ -25,6 +27,7 @@ export function WordRows({
         const key = normalizeWord(word);
         const isMastered = masteredKeys.has(key);
         const isTricky = trickyKeys.has(key);
+        const context = wordContextFor(word, contexts);
 
         return (
           <article
@@ -39,7 +42,10 @@ export function WordRows({
           >
             <div className={styles.wordRowCopy}>
               <span className={styles.wordChip}>{word}</span>
-              <p>{sentenceFor(word, index)}</p>
+              <p>
+                {context.kind === "definition" ? "Meaning: " : ""}
+                {context.text}
+              </p>
             </div>
 
             <div className={styles.wordRowActions}>

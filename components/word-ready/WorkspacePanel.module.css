@@ -37,6 +37,16 @@
   font-weight: 600;
 }
 
+.dictionaryCredit {
+  margin: 12px 0 0;
+  color: #626974;
+  font-size: 12px;
+}
+
+.dictionaryCredit a {
+  color: #2f5f9f;
+}
+
 @media (max-width: 900px) {
   .workspacePanel {
     min-height: 680px;

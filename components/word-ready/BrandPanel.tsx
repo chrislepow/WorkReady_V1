@@ -5,12 +5,13 @@ import { MAX_DAYS, MIN_DAYS, PlanItem } from "@/lib/wordready";
 import styles from "./BrandPanel.module.css";
 
 type BrandPanelProps = {
-  daysUntilTest: number;
-  plan: PlanItem[];
-  wordText: string;
-  onClearWords: () => void;
-  onDaysChange: (days: number) => void;
-  onWordTextChange: (text: string) => void;
+  readonly daysUntilTest: number;
+  readonly plan: PlanItem[];
+  readonly wordText: string;
+  readonly onClearWords: () => void;
+  readonly onDaysChange: (days: number) => void;
+  readonly onWordEntryFocusChange: (focused: boolean) => void;
+  readonly onWordTextChange: (text: string) => void;
 };
 
 export function BrandPanel({
@@ -19,6 +20,7 @@ export function BrandPanel({
   wordText,
   onClearWords,
   onDaysChange,
+  onWordEntryFocusChange,
   onWordTextChange,
 }: BrandPanelProps) {
   const todayPlan = plan[0];
@@ -76,7 +78,9 @@ export function BrandPanel({
         <textarea
           aria-label="Class words"
           className={styles.wordEntry}
+          onBlur={() => onWordEntryFocusChange(false)}
           onChange={(event) => onWordTextChange(event.target.value)}
+          onFocus={() => onWordEntryFocusChange(true)}
           placeholder="Start typing your words..."
           spellCheck={false}
           value={wordText}

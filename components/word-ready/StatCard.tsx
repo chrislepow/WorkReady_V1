@@ -1,9 +1,9 @@
 import styles from "./StatCard.module.css";
 
 type StatCardProps = {
-  accent: "target" | "brain" | "streak" | "accuracy";
-  label: string;
-  value: string;
+  readonly accent: "target" | "brain" | "streak" | "accuracy";
+  readonly label: string;
+  readonly value: string;
 };
 
 const accentClass = {
@@ -13,7 +13,7 @@ const accentClass = {
   target: styles.target,
 };
 
-export function StatCard({ accent, label, value }: StatCardProps) {
+export  function StatCard({ accent, label, value }: StatCardProps) {
   return (
     <article className={`${styles.statCard} ${accentClass[accent]}`}>
       <div className={styles.statValue}>

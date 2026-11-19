@@ -1,3 +1,12 @@
+import {
+  blankSentenceFor,
+  normalizeWord,
+  wordContextFor,
+  type WordContexts,
+} from "./word-context";
+
+export { normalizeWord } from "./word-context";
+
 export type PracticeMode = "sentences" | "fill" | "unscramble" | "mixed" | "mock";
 
 export type FeedbackStatus = "correct" | "missed";
@@ -59,10 +68,6 @@ export function boundNumber(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-export function normalizeWord(word: string) {
-  return word.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
 export function normalizeAnswer(word: string) {
   return word.trim().toLowerCase().replace(/[\s-]+/g, "");
 }
@@ -84,35 +89,6 @@ export function parseWords(text: string) {
       seen.add(normalized);
       return true;
     });
-}
-
-export function sentenceFor(word: string, index: number) {
-  const sentenceWord = word.toLowerCase();
-  const templates = [
-    `The weather tomorrow will be rainy.`,
-    `There is one window open in the house.`,
-    `I have one bookshelf at home with a lot of books.`,
-    `It is comfortable to sit by the fireplace during the winter.`,
-    `Our television is on the wall in our house.`,
-    `The headphones fit neatly inside the backpack.`,
-    `The streetlight turns on when the evening gets dark.`,
-    `We walked along the sidewalk after school.`,
-  ];
-
-  if (templates[index]) {
-    return templates[index].replace(
-      /\b(tomorrow|window|bookshelf|fireplace|television|headphones|streetlight|sidewalk)\b/i,
-      sentenceWord,
-    );
-  }
-
-  return `The class practiced ${sentenceWord} before the spelling test.`;
-}
-
-export function blankSentenceFor(word: string, index: number) {
-  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-  return sentenceFor(word, index).replace(new RegExp(escaped, "i"), "_____");
 }
 
 export function scrambleWord(word: string) {
@@ -139,7 +115,7 @@ export function scrambleWord(word: string) {
   return scrambled;
 }
 
-export function buildPracticeItems(mode: PracticeMode, words: string[]) {
+export function buildPracticeItems(mode: PracticeMode, words: string[], contexts?: WordContexts) {
   if (mode === "sentences") {
     return [];
   }
@@ -148,13 +124,15 @@ export function buildPracticeItems(mode: PracticeMode, words: string[]) {
     const mixedType = index % 2 === 0 ? "fill" : "unscramble";
     const itemType = mode === "mixed" ? mixedType : mode;
     const isUnscramble = itemType === "unscramble";
+    const context = wordContextFor(word, contexts);
+    const blankSentence = blankSentenceFor(word, context);
 
     return {
       id: `${mode}-${normalizeWord(word)}-${index}`,
       word,
       type: itemType,
-      prompt: isUnscramble ? scrambleWord(word) : blankSentenceFor(word, index),
-      helper: isUnscramble ? blankSentenceFor(word, index) : undefined,
+      prompt: isUnscramble ? scrambleWord(word) : blankSentence,
+      helper: isUnscramble ? blankSentence : undefined,
     };
   });
 }

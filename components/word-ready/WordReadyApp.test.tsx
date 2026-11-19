@@ -1,12 +1,16 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import WordReadyApp from "./WordReadyApp";
 
 describe("WordReadyApp", () => {
   beforeEach(() => {
     window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("starts in the no words state", () => {
@@ -22,12 +26,54 @@ describe("WordReadyApp", () => {
 
     render(<WordReadyApp />);
 
-    await user.type(screen.getByLabelText("Class words"), "Tomorrow\nWindow\nBookshelf");
+    await user.type(screen.getByLabelText("Class words"), "Bookshelf\nTomorrow\nWindow");
 
     expect(screen.getByLabelText("3 words")).toBeInTheDocument();
     expect(screen.getByText("Tomorrow")).toBeInTheDocument();
     expect(screen.getByText("Window")).toBeInTheDocument();
     expect(screen.getByText("Bookshelf")).toBeInTheDocument();
+    expect(screen.getByText("There is one window open in the house.")).toBeInTheDocument();
+  });
+
+  it("looks up completed words on blur and uses their context in practice", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.endsWith("/curious")) {
+        return Response.json([{
+          meanings: [{ definitions: [{ example: "The curious cat peeked into the box." }] }],
+        }]);
+      }
+      if (url.endsWith("/rainbow")) {
+        return Response.json([{
+          meanings: [{ definitions: [{ definition: "An arc of colors that appears after rain." }] }],
+        }]);
+      }
+      return new Response(null, { status: 404 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<WordReadyApp />);
+
+    const wordEntry = screen.getByLabelText("Class words");
+    const sentencesTab = screen.getByRole("tab", { name: "Sentences" });
+    await user.type(wordEntry, "Curious\nRainbow\nZigzor");
+    expect(wordEntry).toHaveFocus();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    await user.click(sentencesTab);
+    expect(wordEntry).not.toHaveFocus();
+    expect(await screen.findByText("The curious cat peeked into the box.")).toBeInTheDocument();
+    expect(screen.getByText("Meaning: An arc of colors that appears after rain.")).toBeInTheDocument();
+    expect(screen.getByText('The teacher asked us to spell "Zigzor".')).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "Fill Blanks" }));
+    expect(screen.getByText("The _____ cat peeked into the box.")).toBeInTheDocument();
+    expect(screen.getByText("_____ means: An arc of colors that appears after rain.")).toBeInTheDocument();
+
+    await user.click(wordEntry);
+    expect(wordEntry).toHaveFocus();
+    expect(wordEntry).toHaveValue("Curious\nRainbow\nZigzor");
+    await user.click(sentencesTab);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("shows active states for mastered and tricky word actions", async () => {
