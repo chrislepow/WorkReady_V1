@@ -28,6 +28,7 @@ import { WorkspacePanel } from "./WorkspacePanel";
 export default function WordReadyApp() {
   const [name, setName] = useState("");
   const [wordText, setWordText] = useState("");
+  const [lockedWordText, setLockedWordText] = useState("");
   const [hasRejectedWords, setHasRejectedWords] = useState(false);
   const [isEditingWords, setIsEditingWords] = useState(false);
   const [daysUntilTest, setDaysUntilTest] = useState(5);
@@ -39,9 +40,14 @@ export default function WordReadyApp() {
   const [masteredWords, setMasteredWords] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
 
-  const canPractice = name.trim().length > 0;
+  const learnerName = name.trim();
+  const canPractice = learnerName.length > 0;
   const acceptedText = useMemo(() => filterClassWords(wordText).text, [wordText]);
-  const words = useMemo(() => parseWords(acceptedText), [acceptedText]);
+  const combinedWordText = lockedWordText && acceptedText
+    ? `${lockedWordText.trimEnd()}\n${acceptedText}`
+    : lockedWordText || acceptedText;
+  const words = useMemo(() => parseWords(combinedWordText), [combinedWordText]);
+  const lockedWordCount = useMemo(() => parseWords(lockedWordText).length, [lockedWordText]);
   const contexts = useWordContexts(words, isEditingWords || !canPractice);
   const plan = useMemo(() => buildPlan(daysUntilTest), [daysUntilTest]);
   const trickyKeys = useMemo(() => new Set(trickyWords), [trickyWords]);
@@ -73,7 +79,7 @@ export default function WordReadyApp() {
 
     if (storedWords) {
       const filtered = filterClassWords(storedWords);
-      setWordText(filtered.text);
+      setLockedWordText(filtered.text.trim());
       setHasRejectedWords(filtered.rejected > 0);
     }
 
@@ -88,18 +94,24 @@ export default function WordReadyApp() {
   }, []);
 
   useEffect(() => {
-    if (isReady) {
-      window.localStorage.setItem(STORAGE_KEYS.name, name.trim());
+    if (!isReady) {
+      return;
     }
-  }, [isReady, name]);
+
+    if (learnerName) {
+      window.localStorage.setItem(STORAGE_KEYS.name, learnerName);
+    } else {
+      window.localStorage.removeItem(STORAGE_KEYS.name);
+    }
+  }, [isReady, learnerName]);
 
   useEffect(() => {
     if (!isReady) {
       return;
     }
 
-    window.localStorage.setItem(STORAGE_KEYS.words, acceptedText);
-  }, [isReady, acceptedText]);
+    window.localStorage.setItem(STORAGE_KEYS.words, combinedWordText);
+  }, [isReady, combinedWordText]);
 
   useEffect(() => {
     if (!isReady) {
@@ -156,15 +168,21 @@ export default function WordReadyApp() {
   function handleWordEntryFocusChange(focused: boolean) {
     setIsEditingWords(focused);
     if (!focused) {
-      if (acceptedText !== wordText) {
-        setHasRejectedWords(true);
-      }
-      setWordText(acceptedText);
+      lockWordList();
     }
+  }
+
+  function lockWordList() {
+    if (acceptedText !== wordText) {
+      setHasRejectedWords(true);
+    }
+    setLockedWordText(combinedWordText.trim());
+    setWordText("");
   }
 
   function clearWords() {
     setWordText("");
+    setLockedWordText("");
     setHasRejectedWords(false);
     clearAnswers();
     setHiddenWordKeys(new Set());
@@ -233,6 +251,7 @@ export default function WordReadyApp() {
   }
 
   function hideWord(word: string) {
+    lockWordList();
     const key = normalizeWord(word);
     setHiddenWordKeys((current) => current.has(key) ? current : new Set([...current, key]));
   }
@@ -243,8 +262,11 @@ export default function WordReadyApp() {
   }
 
   function resetPractice() {
+    setName("");
     clearAnswers();
     setHiddenWordKeys(new Set());
+    setWordText(combinedWordText);
+    setLockedWordText("");
     if (activeMode === "mock") {
       setActiveMode("sentences");
     }
@@ -254,6 +276,7 @@ export default function WordReadyApp() {
     if (!canPractice || activeMode === "mock" || mode === activeMode) {
       return;
     }
+    lockWordList();
     setActiveMode(mode);
     clearAnswers();
   }
@@ -263,6 +286,7 @@ export default function WordReadyApp() {
       <BrandPanel
         daysUntilTest={daysUntilTest}
         hasRejectedWords={hasRejectedWords}
+        lockedWordCount={lockedWordCount}
         name={name}
         onClearWords={clearWords}
         onDaysChange={setDays}
@@ -286,10 +310,11 @@ export default function WordReadyApp() {
           onGrade={gradePractice}
           onGradeSentence={gradeSentence}
           onHideWord={hideWord}
+          onLockWordList={lockWordList}
           onMarkMastered={markMastered}
           onMarkTricky={markTricky}
           onModeChange={switchMode}
-          onResetPractice={resetPractice}
+          onResetPractice={canPractice || words.length > 0 || activeMode === "mock" ? resetPractice : undefined}
           onUpdateAnswer={updateAnswer}
           practiceItems={practiceItems}
           trickyKeys={trickyKeys}

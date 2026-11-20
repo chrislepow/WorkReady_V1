@@ -20,6 +20,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 211px 158px;
   min-height: 105px;
+  flex: 0 0 auto;
   align-items: center;
   gap: 20px;
   border: 1px solid #ececec;

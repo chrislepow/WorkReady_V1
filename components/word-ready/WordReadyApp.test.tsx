@@ -37,17 +37,23 @@ describe("WordReadyApp", () => {
     tabs.forEach((tab) => expect(tab).toBeDisabled());
     expect(screen.queryByRole("textbox", { name: "Answer for word 1" })).not.toBeInTheDocument();
     expect(screen.queryByRole("timer")).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Hello,/)).not.toBeInTheDocument();
 
     await user.type(name, "  ");
     expect(tabs[0]).toBeDisabled();
     await user.type(name, "Alex");
     tabs.forEach((tab) => expect(tab).toBeEnabled());
+    const sidebar = within(screen.getByRole("complementary", { name: "WordReady controls" }));
+    expect(sidebar.getByText("Hello, Alex").nextElementSibling).toBe(sidebar.getByLabelText("Word Ready"));
     expect(screen.getByRole("textbox", { name: "Answer for word 1" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reset" })).toBeEnabled();
     expect(window.localStorage.getItem(STORAGE_KEYS.name)).toBe("Alex");
 
-    await user.clear(name);
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(name).toHaveValue("");
     tabs.forEach((tab) => expect(tab).toBeDisabled());
+    expect(screen.queryByText(/^Hello,/)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem(STORAGE_KEYS.name)).toBeNull();
   });
 
   it("shows word rows when class words are entered", async () => {
@@ -97,9 +103,38 @@ describe("WordReadyApp", () => {
 
     await user.click(screen.getByRole("tab", { name: "Fill Blanks" }));
     await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.type(screen.getByRole("textbox", { name: "Name" }), "Alex");
     await user.click(screen.getByRole("tab", { name: "Sentences" }));
     expect(screen.queryByRole("img", { name: "Hidden word" })).not.toBeInTheDocument();
     expect(screen.getByText("There is one window open in the house.")).toBeInTheDocument();
+  });
+
+  it("keeps saved class words out of the editor while more words are added and restores them on reset", async () => {
+    const user = userEvent.setup();
+    render(<WordReadyApp />);
+
+    const entry = screen.getByRole("textbox", { name: "Class words" });
+    await user.type(entry, "Window");
+    await user.click(screen.getByRole("textbox", { name: "Answer for word 1" }));
+    const hiddenList = screen.getByRole("group", { name: "Hidden class words: 1" });
+    expect(hiddenList).not.toHaveTextContent("Window");
+    expect(entry).toHaveValue("");
+
+    await user.type(entry, "Tomorrow");
+    expect(entry).toHaveValue("Tomorrow");
+    expect(hiddenList).toBeInTheDocument();
+    expect(screen.getByLabelText("2 words")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Fill Blanks" }));
+    expect(screen.getByRole("group", { name: "Hidden class words: 2" })).toBeInTheDocument();
+    expect(window.localStorage.getItem(STORAGE_KEYS.words)).toBe("Window\nTomorrow");
+
+    const reset = screen.getByRole("button", { name: "Reset" });
+    const tabs = screen.getByRole("tablist", { name: "Practice modes" });
+    expect(reset.previousElementSibling).toBe(tabs);
+    expect(tabs.lastElementChild).toBe(within(tabs).getByRole("tab", { name: "Mock Test" }));
+    await user.click(reset);
+    expect(entry).toHaveValue("Window\nTomorrow");
+    expect(screen.queryByRole("group", { name: /^Hidden class words/ })).not.toBeInTheDocument();
   });
 
   it("keeps valid words from a mixed list and does not send rejected entries to the dictionary", async () => {
@@ -116,7 +151,8 @@ describe("WordReadyApp", () => {
     expect(window.localStorage.getItem("wordready.words")).toBe("Window\nCLASS\nWindow");
 
     await user.click(screen.getByRole("tab", { name: "Sentences" }));
-    expect(entry).toHaveValue("Window\nCLASS\nWindow");
+    expect(entry).toHaveValue("");
+    expect(screen.getByRole("group", { name: "Hidden class words: 2" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledExactlyOnceWith("/api/word-context?word=class", expect.anything());
   });
 
@@ -193,7 +229,8 @@ describe("WordReadyApp", () => {
 
     await user.click(wordEntry);
     expect(wordEntry).toHaveFocus();
-    expect(wordEntry).toHaveValue("Curious\nRainbow\nZigzor");
+    expect(wordEntry).toHaveValue("");
+    expect(screen.getByRole("group", { name: "Hidden class words: 3" })).toBeInTheDocument();
     await user.click(sentencesTab);
     expect(fetchMock.mock.calls.filter(([url]) => url.startsWith("/api/"))).toHaveLength(3);
   });
@@ -229,9 +266,11 @@ describe("WordReadyApp", () => {
     expect(screen.getByRole("button", { name: "Mark word 1 mastered" })).toHaveAttribute("aria-pressed", "true");
 
     await user.click(screen.getByRole("button", { name: "Reset" }));
-    expect(answer).toHaveValue("");
-    expect(check).toBeDisabled();
-    expect(result).not.toHaveAttribute("data-status");
+    await user.type(screen.getByRole("textbox", { name: "Name" }), "Alex");
+    expect(screen.getByRole("textbox", { name: "Answer for word 1" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Check answer for word 1" })).toBeDisabled();
+    expect(within(screen.getByRole("region", { name: "Sentence practice" })).getByRole("status"))
+      .not.toHaveAttribute("data-status");
     expect(screen.getByText("The weather tomorrow will be rainy.")).toBeInTheDocument();
   });
 
@@ -328,6 +367,8 @@ describe("WordReadyApp", () => {
     expect(mockTest).toHaveAttribute("aria-selected", "true");
 
     await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(mockTest).toBeDisabled();
+    await user.type(screen.getByRole("textbox", { name: "Name" }), "Alex");
     otherTabs.forEach((tab) => expect(tab).toBeEnabled());
     expect(sentences).toHaveAttribute("aria-selected", "true");
     await user.click(mockTest);
@@ -344,8 +385,9 @@ describe("WordReadyApp", () => {
     await user.click(screen.getByRole("button", { name: "Clear" }));
     const sentences = screen.getByRole("tab", { name: "Sentences" });
     expect(sentences).toBeDisabled();
-    expect(screen.getByText("No words available.")).toBeInTheDocument();
+    expect(screen.getByLabelText("0 words")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.type(screen.getByRole("textbox", { name: "Name" }), "Alex");
     expect(sentences).toBeEnabled();
     expect(sentences).toHaveAttribute("aria-selected", "true");
   });

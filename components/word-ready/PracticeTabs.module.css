@@ -6,22 +6,33 @@
 
 .practiceTabs p {
   width: 133px;
+  flex-shrink: 0;
   margin: 3px 0 0;
   color: #111827;
   font-size: 16px;
   line-height: 19px;
 }
 
-.practiceTabs div {
+.practiceControls {
   display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: 16px;
+  min-width: 0;
+  flex: 1;
+  align-items: flex-end;
+  gap: 12px;
 }
 
-.practiceTabs button {
-  min-width: 128px;
+.tabList {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tabList button {
+  min-width: 106px;
   height: 41px;
+  flex: 1 1 106px;
   border: 1px solid #e0e3e8;
   border-radius: 5px;
   background: #ffffff;
@@ -30,23 +41,43 @@
   box-shadow: 0 3px 3px rgba(17, 24, 39, 0.18);
 }
 
-.practiceTabs button.active {
+.tabList button.active {
   background: #f1f6fd;
   box-shadow: 0 3px 3px rgba(17, 24, 39, 0.18);
 }
 
-.practiceTabs button:last-child {
+.tabList button:last-child {
   background: #eefbf2;
 }
 
-.practiceTabs button.active:last-child {
+.tabList button.active:last-child {
   background: #f1f6fd;
 }
 
-.practiceTabs button:disabled {
+.tabList button:disabled {
   background: #f3f5f8;
   color: #697283;
   box-shadow: none;
+}
+
+.resetButton {
+  display: inline-flex;
+  min-width: 76px;
+  height: 41px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #d5dae3;
+  border-radius: 5px;
+  padding: 0 8px;
+  background: #ffffff;
+  color: #2f5f9f;
+  font-size: 15px;
+}
+
+.resetButton:hover {
+  background: #f1f6fd;
 }
 
 @media (max-width: 650px) {
@@ -58,12 +89,7 @@
     width: 100%;
   }
 
-  .practiceTabs div {
+  .practiceControls {
     width: 100%;
-  }
-
-  .practiceTabs button {
-    min-width: 132px;
-    flex: 1 1 auto;
   }
 }

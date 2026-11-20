@@ -1,4 +1,4 @@
-import { RotateCcw, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 
 import {
   FeedbackStatus,
@@ -24,10 +24,11 @@ type WorkspacePanelProps = {
   readonly onGrade: () => void;
   readonly onGradeSentence: (item: PracticeItem) => void;
   readonly onHideWord: (word: string) => void;
+  readonly onLockWordList: () => void;
   readonly onMarkMastered: (word: string) => void;
   readonly onMarkTricky: (word: string) => void;
   readonly onModeChange: (mode: PracticeMode) => void;
-  readonly onResetPractice: () => void;
+  readonly onResetPractice?: () => void;
   readonly onUpdateAnswer: (id: string, value: string) => void;
   readonly practiceItems: PracticeItem[];
   readonly trickyKeys: Set<string>;
@@ -45,6 +46,7 @@ export function WorkspacePanel({
   onGrade,
   onGradeSentence,
   onHideWord,
+  onLockWordList,
   onMarkMastered,
   onMarkTricky,
   onModeChange,
@@ -60,21 +62,18 @@ export function WorkspacePanel({
 
   return (
     <section className={styles.workspacePanel} aria-label="Practice workspace">
-      <PracticeTabs activeMode={activeMode} disabled={!canPractice} onModeChange={onModeChange} />
+      <PracticeTabs
+        activeMode={activeMode}
+        disabled={!canPractice}
+        onModeChange={onModeChange}
+        onResetPractice={onResetPractice}
+      />
 
       <div className={styles.workspaceDivider} />
 
-      <div className={styles.practiceSummary}>
-        <div className={styles.wordCountBadge} aria-label={`${words.length} words`}>
-          <strong>{words.length}</strong>
-          <span>Words</span>
-        </div>
-        {canPractice && (words.length > 0 || activeMode === "mock") && (
-          <button className={styles.resetButton} onClick={onResetPractice} type="button">
-            <RotateCcw aria-hidden="true" size={17} />
-            Reset
-          </button>
-        )}
+      <div className={styles.wordCountBadge} aria-label={`${words.length} words`}>
+        <strong>{words.length}</strong>
+        <span>Words</span>
       </div>
 
       {!canPractice ? (
@@ -104,6 +103,7 @@ export function WorkspacePanel({
           feedback={feedback}
           items={practiceItems}
           mode={activeMode}
+          onFocusAnswer={onLockWordList}
           onGrade={onGrade}
           onUpdateAnswer={onUpdateAnswer}
         />

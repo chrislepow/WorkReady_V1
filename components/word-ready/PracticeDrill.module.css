@@ -35,7 +35,8 @@
 
 .drillRow {
   display: grid;
-  grid-template-columns: 1fr 260px 155px;
+  grid-template-columns: minmax(0, 1fr) 260px 155px;
+  flex: 0 0 auto;
   align-items: center;
   gap: 18px;
   min-height: 116px;
@@ -44,6 +45,11 @@
   padding: 18px 20px;
   background: #ffffff;
   box-shadow: 0 3px 8px rgba(17, 24, 39, 0.14);
+}
+
+.drillPrompt,
+.resultPill {
+  overflow-wrap: anywhere;
 }
 
 .drillRowCorrect {
@@ -102,6 +108,10 @@
   font-weight: 700;
 }
 
+.resultPill svg {
+  flex: none;
+}
+
 .resultPillCorrect {
   background: #eefbf2;
   color: #2f8c4b;
@@ -114,7 +124,7 @@
 
 @media (max-width: 1160px) {
   .drillRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .drillRow input {

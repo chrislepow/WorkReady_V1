@@ -3,7 +3,7 @@ import { StatCard } from "./StatCard";
 import styles from "./AppHeader.module.css";
 
 type AppHeaderProps = {
-  stats: DashboardStats;
+  readonly stats: DashboardStats;
 };
 
 export function AppHeader({ stats }: AppHeaderProps) {

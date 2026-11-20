@@ -8,6 +8,7 @@ import styles from "./BrandPanel.module.css";
 type BrandPanelProps = {
   readonly daysUntilTest: number;
   readonly hasRejectedWords: boolean;
+  readonly lockedWordCount: number;
   readonly name: string;
   readonly plan: PlanItem[];
   readonly wordText: string;
@@ -21,6 +22,7 @@ type BrandPanelProps = {
 export function BrandPanel({
   daysUntilTest,
   hasRejectedWords,
+  lockedWordCount,
   name,
   plan,
   wordText,
@@ -31,9 +33,11 @@ export function BrandPanel({
   onWordTextChange,
 }: BrandPanelProps) {
   const todayPlan = plan[0];
+  const learnerName = name.trim();
 
   return (
     <aside className={styles.brandPanel} aria-label="WordReady controls">
+      {learnerName && <p className={styles.greeting}>Hello, {learnerName}</p>}
       <div className={styles.brandLockup} aria-label="Word Ready">
         <div className={styles.brandWord}>WORD</div>
         <div className={styles.brandReady}>READY</div>
@@ -99,17 +103,30 @@ export function BrandPanel({
           <BookOpen aria-hidden="true" size={23} />
           Class Words
         </h2>
-        <textarea
-          aria-describedby={hasRejectedWords ? "class-words-warning" : undefined}
-          aria-label="Class words"
-          className={styles.wordEntry}
-          onBlur={() => onWordEntryFocusChange(false)}
-          onChange={onWordTextChange}
-          onFocus={() => onWordEntryFocusChange(true)}
-          placeholder="Start typing your words..."
-          spellCheck={false}
-          value={wordText}
-        />
+        <div className={styles.wordEntryFrame}>
+          {lockedWordCount > 0 && (
+            <div
+              aria-label={`Hidden class words: ${lockedWordCount}`}
+              className={styles.hiddenWordList}
+              role="group"
+            >
+              <ul aria-hidden="true">
+                {Array.from({ length: lockedWordCount }, (_, index) => <li key={index} />)}
+              </ul>
+            </div>
+          )}
+          <textarea
+            aria-describedby={hasRejectedWords ? "class-words-warning" : undefined}
+            aria-label="Class words"
+            className={styles.wordEntry}
+            onBlur={() => onWordEntryFocusChange(false)}
+            onChange={onWordTextChange}
+            onFocus={() => onWordEntryFocusChange(true)}
+            placeholder={lockedWordCount > 0 ? "Add more words..." : "Start typing your words..."}
+            spellCheck={false}
+            value={wordText}
+          />
+        </div>
         {hasRejectedWords && (
           <p className={styles.wordEntryWarning} id="class-words-warning" role="status">
             Profanity, numbers, and symbols are blocked. Enter words separated by commas or new lines.

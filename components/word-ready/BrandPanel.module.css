@@ -41,6 +41,16 @@
   z-index: 1;
 }
 
+.greeting {
+  margin: 0 0 14px;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
 .brandLockup {
   margin: 2px 0 25px;
   text-align: center;
@@ -180,27 +190,65 @@
   font-size: 18px;
 }
 
-.wordEntry {
-  display: block;
+.wordEntryFrame {
+  display: flex;
   width: 235px;
   height: 258px;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.05);
+}
+
+.wordEntryFrame:focus-within {
+  outline: 3px solid #a9d9ff;
+  outline-offset: 2px;
+}
+
+.wordEntry {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
   resize: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: inherit;
   padding: 15px 16px;
-  background: #ffffff;
+  background: transparent;
   color: #111827;
   font-size: 16px;
   line-height: 21px;
-  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.05);
+}
+
+.wordEntry:focus-visible {
+  outline: none;
 }
 
 .wordEntry::placeholder {
   color: #777777;
 }
 
-.wordEntry:not(:focus):not(:placeholder-shown) {
-  filter: blur(3px);
+.hiddenWordList {
+  max-height: 164px;
+  overflow-y: auto;
+  border-bottom: 1px solid #e3e6eb;
+  padding: 12px 16px;
+}
+
+.hiddenWordList ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hiddenWordList li {
+  width: 75px;
+  height: 11px;
+  border-radius: 3px;
+  background: #626b79;
+  filter: blur(4px);
 }
 
 .wordEntryWarning {
@@ -395,6 +443,7 @@
     padding: 30px 28px 34px;
   }
 
+  .greeting,
   .brandLockup {
     text-align: left;
   }
@@ -404,7 +453,7 @@
     margin-left: 0;
   }
 
-  .wordEntry,
+  .wordEntryFrame,
   .countdownCard {
     width: 100%;
   }

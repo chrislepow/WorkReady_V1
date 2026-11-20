@@ -13,32 +13,6 @@
   background: #e7e7e7;
 }
 
-.practiceSummary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.resetButton {
-  display: inline-flex;
-  min-width: 87px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  border: 1px solid #d5dae3;
-  border-radius: 5px;
-  padding: 0 12px;
-  background: #ffffff;
-  color: #2f5f9f;
-  font-size: 15px;
-}
-
-.resetButton:hover {
-  background: #f1f6fd;
-}
-
 .namePrompt {
   display: grid;
   min-height: 280px;

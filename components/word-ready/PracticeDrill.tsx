@@ -9,6 +9,7 @@ type PracticeDrillProps = {
   readonly feedback: Record<string, FeedbackStatus>;
   readonly items: PracticeItem[];
   readonly mode: PracticeMode;
+  readonly onFocusAnswer: () => void;
   readonly onGrade: () => void;
   readonly onUpdateAnswer: (id: string, value: string) => void;
 };
@@ -18,6 +19,7 @@ export function PracticeDrill({
   feedback,
   items,
   mode,
+  onFocusAnswer,
   onGrade,
   onUpdateAnswer,
 }: PracticeDrillProps) {
@@ -59,6 +61,7 @@ export function PracticeDrill({
                   aria-label={`Answer for word ${index + 1}`}
                   autoCapitalize="none"
                   onChange={(event) => onUpdateAnswer(item.id, event.target.value)}
+                  onFocus={onFocusAnswer}
                   placeholder="Type the word"
                   spellCheck={false}
                   value={answers[item.id] ?? ""}

@@ -1,5 +1,6 @@
 .appHeader {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
@@ -7,6 +8,9 @@
 }
 
 .appTitle {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
   padding-top: 7px;
 }
 
@@ -19,7 +23,7 @@
 }
 
 .appTitle p {
-  width: 250px;
+  max-width: 250px;
   margin: 5px 0 0;
   color: #111827;
   font-size: 16px;
@@ -28,29 +32,15 @@
 
 .statsGrid {
   display: flex;
-  flex: 0 0 632px;
   flex-wrap: wrap;
-  justify-content: flex-end;
   gap: 20px;
-  width: 632px;
-}
-
-@media (max-width: 1160px) {
-  .appHeader {
-    flex-direction: column;
-  }
-
-  .statsGrid {
-    flex: 1 1 auto;
-    justify-content: flex-start;
-    width: 100%;
-  }
+  max-width: 100%;
 }
 
 @media (max-width: 650px) {
   .statsGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     width: 100%;
   }
@@ -58,6 +48,6 @@
 
 @media (max-width: 470px) {
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
