@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import { lookupWordContext } from "@/lib/dictionary";
 import { builtInSentenceFor, normalizeWord, type WordContexts, type WordContext } from "@/lib/word-context";
 
 export function useWordContexts(words: string[], isEditing: boolean) {
@@ -45,4 +44,15 @@ export function useWordContexts(words: string[], isEditing: boolean) {
   }, [words, isEditing]);
 
   return contexts;
+}
+
+async function lookupWordContext(word: string, signal: AbortSignal): Promise<WordContext | null> {
+  const query = new URLSearchParams({ word });
+  const response = await fetch(`/api/word-context?${query}`, { signal });
+
+  if (!response.ok) {
+    throw new Error("Dictionary lookup failed");
+  }
+
+  return response.json();
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 
+import { filterClassWords, isAllowedClassWordWhileTyping } from "@/lib/class-words";
 import {
   boundNumber,
   buildPlan,
@@ -12,6 +13,7 @@ import {
   normalizeAnswer,
   normalizeWord,
   parseWords,
+  PracticeItem,
   PracticeMode,
   STORAGE_KEYS,
   buildPracticeItems,
@@ -24,18 +26,23 @@ import styles from "./WordReadyApp.module.css";
 import { WorkspacePanel } from "./WorkspacePanel";
 
 export default function WordReadyApp() {
+  const [name, setName] = useState("");
   const [wordText, setWordText] = useState("");
+  const [hasRejectedWords, setHasRejectedWords] = useState(false);
   const [isEditingWords, setIsEditingWords] = useState(false);
   const [daysUntilTest, setDaysUntilTest] = useState(5);
   const [activeMode, setActiveMode] = useState<PracticeMode>("sentences");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<Record<string, FeedbackStatus>>({});
+  const [hiddenWordKeys, setHiddenWordKeys] = useState<ReadonlySet<string>>(() => new Set());
   const [trickyWords, setTrickyWords] = useState<string[]>([]);
   const [masteredWords, setMasteredWords] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
 
-  const words = useMemo(() => parseWords(wordText), [wordText]);
-  const contexts = useWordContexts(words, isEditingWords);
+  const canPractice = name.trim().length > 0;
+  const acceptedText = useMemo(() => filterClassWords(wordText).text, [wordText]);
+  const words = useMemo(() => parseWords(acceptedText), [acceptedText]);
+  const contexts = useWordContexts(words, isEditingWords || !canPractice);
   const plan = useMemo(() => buildPlan(daysUntilTest), [daysUntilTest]);
   const trickyKeys = useMemo(() => new Set(trickyWords), [trickyWords]);
   const masteredKeys = useMemo(() => new Set(masteredWords), [masteredWords]);
@@ -58,13 +65,16 @@ export default function WordReadyApp() {
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- Local storage hydration only runs in the browser. */
+    setName(window.localStorage.getItem(STORAGE_KEYS.name) ?? "");
     const storedWords = window.localStorage.getItem(STORAGE_KEYS.words);
     const storedDays = window.localStorage.getItem(STORAGE_KEYS.days);
     const storedTricky = window.localStorage.getItem(STORAGE_KEYS.tricky);
     const storedMastered = window.localStorage.getItem(STORAGE_KEYS.mastered);
 
     if (storedWords) {
-      setWordText(storedWords);
+      const filtered = filterClassWords(storedWords);
+      setWordText(filtered.text);
+      setHasRejectedWords(filtered.rejected > 0);
     }
 
     if (storedDays) {
@@ -78,12 +88,18 @@ export default function WordReadyApp() {
   }, []);
 
   useEffect(() => {
+    if (isReady) {
+      window.localStorage.setItem(STORAGE_KEYS.name, name.trim());
+    }
+  }, [isReady, name]);
+
+  useEffect(() => {
     if (!isReady) {
       return;
     }
 
-    window.localStorage.setItem(STORAGE_KEYS.words, wordText);
-  }, [isReady, wordText]);
+    window.localStorage.setItem(STORAGE_KEYS.words, acceptedText);
+  }, [isReady, acceptedText]);
 
   useEffect(() => {
     if (!isReady) {
@@ -113,16 +129,45 @@ export default function WordReadyApp() {
     setDaysUntilTest(boundNumber(nextDays, MIN_DAYS, MAX_DAYS));
   }
 
-  function handleWordsChange(nextText: string) {
-    setWordText(nextText);
-    setAnswers({});
-    setFeedback({});
+  function handleWordsChange(event: ChangeEvent<HTMLTextAreaElement>) {
+    const { value, selectionStart } = event.currentTarget;
+    const input = event.nativeEvent as InputEvent;
+    if (input.inputType?.startsWith("delete") || input.isComposing) {
+      setWordText(value);
+      setHasRejectedWords(false);
+    } else if (input.inputType === "insertText" && input.data && !/[,\r\n]/.test(input.data)) {
+      const start = Math.max(value.lastIndexOf(",", selectionStart - 1), value.lastIndexOf("\n", selectionStart - 1)) + 1;
+      const rest = value.slice(selectionStart).search(/[,\r\n]/);
+      const entry = value.slice(start, rest === -1 ? value.length : selectionStart + rest).trim();
+      if (entry && !isAllowedClassWordWhileTyping(entry)) {
+        setHasRejectedWords(true);
+        return;
+      }
+      setWordText(value);
+      setHasRejectedWords(false);
+    } else {
+      const filtered = filterClassWords(value);
+      setWordText(filtered.text);
+      setHasRejectedWords(filtered.rejected > 0);
+    }
+    clearAnswers();
+  }
+
+  function handleWordEntryFocusChange(focused: boolean) {
+    setIsEditingWords(focused);
+    if (!focused) {
+      if (acceptedText !== wordText) {
+        setHasRejectedWords(true);
+      }
+      setWordText(acceptedText);
+    }
   }
 
   function clearWords() {
     setWordText("");
-    setAnswers({});
-    setFeedback({});
+    setHasRejectedWords(false);
+    clearAnswers();
+    setHiddenWordKeys(new Set());
     setTrickyWords([]);
     setMasteredWords([]);
   }
@@ -150,11 +195,25 @@ export default function WordReadyApp() {
     });
   }
 
+  function gradeSentence(item: PracticeItem) {
+    const answer = normalizeAnswer(answers[item.id] ?? "");
+    if (!answer) {
+      return;
+    }
+
+    const isCorrect = answer === normalizeAnswer(item.word);
+    setFeedback((current) => ({ ...current, [item.id]: isCorrect ? "correct" : "missed" }));
+    if (isCorrect) {
+      markMastered(item.word);
+    } else {
+      markTricky(item.word);
+    }
+  }
+
   function gradePractice() {
     const nextFeedback: Record<string, FeedbackStatus> = {};
     const nextMastered: string[] = [];
     const nextTricky: string[] = [];
-
     practiceItems.forEach((item) => {
       const isCorrect = normalizeAnswer(answers[item.id] ?? "") === normalizeAnswer(item.word);
       const key = normalizeWord(item.word);
@@ -173,24 +232,42 @@ export default function WordReadyApp() {
     setTrickyWords((current) => nextTricky.reduce(addKey, current));
   }
 
-  function resetPractice() {
+  function hideWord(word: string) {
+    const key = normalizeWord(word);
+    setHiddenWordKeys((current) => current.has(key) ? current : new Set([...current, key]));
+  }
+
+  function clearAnswers() {
     setAnswers({});
     setFeedback({});
   }
 
+  function resetPractice() {
+    clearAnswers();
+    setHiddenWordKeys(new Set());
+    if (activeMode === "mock") {
+      setActiveMode("sentences");
+    }
+  }
+
   function switchMode(mode: PracticeMode) {
+    if (!canPractice || activeMode === "mock" || mode === activeMode) {
+      return;
+    }
     setActiveMode(mode);
-    setAnswers({});
-    setFeedback({});
+    clearAnswers();
   }
 
   return (
     <main className={styles.shell}>
       <BrandPanel
         daysUntilTest={daysUntilTest}
+        hasRejectedWords={hasRejectedWords}
+        name={name}
         onClearWords={clearWords}
         onDaysChange={setDays}
-        onWordEntryFocusChange={setIsEditingWords}
+        onNameChange={setName}
+        onWordEntryFocusChange={handleWordEntryFocusChange}
         onWordTextChange={handleWordsChange}
         plan={plan}
         wordText={wordText}
@@ -201,10 +278,14 @@ export default function WordReadyApp() {
         <WorkspacePanel
           activeMode={activeMode}
           answers={answers}
+          canPractice={canPractice}
           contexts={contexts}
           feedback={feedback}
+          hiddenWordKeys={hiddenWordKeys}
           masteredKeys={masteredKeys}
           onGrade={gradePractice}
+          onGradeSentence={gradeSentence}
+          onHideWord={hideWord}
           onMarkMastered={markMastered}
           onMarkTricky={markTricky}
           onModeChange={switchMode}

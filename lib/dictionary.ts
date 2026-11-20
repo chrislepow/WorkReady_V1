@@ -1,22 +1,24 @@
+import { containsProfanity } from "./class-words";
 import { wordPattern, type WordContext } from "./word-context";
+
+type DictionaryDefinition = {
+  definition?: string;
+  example?: string;
+};
 
 type DictionaryEntry = {
   meanings?: Array<{
-    definitions?: Array<{ definition?: string; example?: string }>;
+    partOfSpeech?: string;
+    definitions?: DictionaryDefinition[];
   }>;
 };
 
 export async function lookupWordContext(word: string, signal: AbortSignal): Promise<WordContext | null> {
-  if (word.length > 64 || !/^\p{L}[\p{L}\p{M}'’ -]*$/u.test(word)) {
-    return null;
-  }
-
   const response = await fetch(
     `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
     {
-      credentials: "omit",
-      referrerPolicy: "no-referrer",
-      signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
+      next: { revalidate: 86400 },
+      signal: AbortSignal.any([signal, AbortSignal.timeout(4000)]),
     },
   );
 
@@ -33,21 +35,52 @@ export async function lookupWordContext(word: string, signal: AbortSignal): Prom
     return null;
   }
 
-  for (const entry of entries) {
-    for (const meaning of entry.meanings ?? []) {
-      for (const definition of meaning.definitions ?? []) {
-        const example = definition.example?.trim();
-        if (example && /[.!?]$/.test(example) && wordPattern(word).test(example)) {
-          return { kind: "sentence", text: example, fromDictionary: true };
-        }
-
-        const gloss = definition.definition?.trim();
-        if (gloss) {
-          return { kind: "definition", text: gloss, fromDictionary: true };
-        }
-      }
+  const senses = entries.flatMap((entry) =>
+    (entry.meanings ?? []).flatMap(({ partOfSpeech, definitions = [] }) =>
+      definitions.map((definition) => ({ ...definition, partOfSpeech })),
+    ),
+  );
+  for (const { example } of senses) {
+    const sentence = example?.trim();
+    if (sentence && sentence.length <= 220 && /[.!?]["'\u2019\u201d]?$/.test(sentence)
+      && /^\p{Lu}/u.test(sentence) && wordPattern(word).test(sentence) && !containsProfanity(sentence)) {
+      return { text: sentence, fromDictionary: true };
     }
   }
 
-  return null;
+  const sense = senses.find(({ definition }) => definition?.trim() && !containsProfanity(definition));
+  const definition = sense?.definition?.trim().replace(/[.!?]+$/, "");
+  if (!definition) {
+    return null;
+  }
+
+  return {
+    text: sentenceFromDefinition(word, definition, sense?.partOfSpeech),
+    fromDictionary: true,
+    adapted: true,
+  };
+}
+
+function sentenceFromDefinition(word: string, definition: string, partOfSpeech?: string) {
+  // Only insert a gloss directly when its form fits the sentence.
+  if (partOfSpeech === "noun" && /^(?:a|an) /i.test(definition)) {
+    const description = definition[0].toLowerCase() + definition.slice(1);
+    if (!wordPattern(word).test(description)) {
+      const article = indefiniteArticle(word) === "an" ? "An" : "A";
+      return `${article} ${word} is ${description}.`;
+    }
+  }
+
+  if (partOfSpeech === "verb" && /^to /i.test(definition)) {
+    return `To ${word} means to ${definition.slice(3)}.`;
+  }
+
+  return `The word "${word}" means "${definition}".`;
+}
+
+function indefiniteArticle(word: string) {
+  return /^(?:hour|honest|honou?r|heir)/i.test(word)
+    || (/^[aeiou]/i.test(word) && !/^(?:uni(?:t|c|f|v|q)|use|usual|user|euro|one)/i.test(word))
+    ? "an"
+    : "a";
 }

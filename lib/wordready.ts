@@ -1,3 +1,4 @@
+import { filterClassWords } from "./class-words";
 import {
   blankSentenceFor,
   normalizeWord,
@@ -14,7 +15,7 @@ export type FeedbackStatus = "correct" | "missed";
 export type PracticeItem = {
   id: string;
   word: string;
-  type: Exclude<PracticeMode, "sentences">;
+  type: PracticeMode;
   prompt: string;
   helper?: string;
 };
@@ -34,6 +35,7 @@ export type DashboardStats = {
 };
 
 export const STORAGE_KEYS = {
+  name: "wordready.name",
   words: "wordready.words",
   days: "wordready.days",
   tricky: "wordready.tricky",
@@ -75,10 +77,7 @@ export function normalizeAnswer(word: string) {
 export function parseWords(text: string) {
   const seen = new Set<string>();
 
-  return text
-    .split(/[\n,]+/)
-    .map((word) => word.trim())
-    .filter(Boolean)
+  return filterClassWords(text).words
     .filter((word) => {
       const normalized = normalizeWord(word);
 
@@ -116,23 +115,19 @@ export function scrambleWord(word: string) {
 }
 
 export function buildPracticeItems(mode: PracticeMode, words: string[], contexts?: WordContexts) {
-  if (mode === "sentences") {
-    return [];
-  }
-
   return words.map((word, index): PracticeItem => {
     const mixedType = index % 2 === 0 ? "fill" : "unscramble";
     const itemType = mode === "mixed" ? mixedType : mode;
     const isUnscramble = itemType === "unscramble";
     const context = wordContextFor(word, contexts);
-    const blankSentence = blankSentenceFor(word, context);
+    const sentence = mode === "sentences" ? context.text : blankSentenceFor(word, context);
 
     return {
       id: `${mode}-${normalizeWord(word)}-${index}`,
       word,
       type: itemType,
-      prompt: isUnscramble ? scrambleWord(word) : blankSentence,
-      helper: isUnscramble ? blankSentence : undefined,
+      prompt: isUnscramble ? scrambleWord(word) : sentence,
+      helper: isUnscramble ? sentence : undefined,
     };
   });
 }

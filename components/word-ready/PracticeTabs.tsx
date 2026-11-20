@@ -4,18 +4,20 @@ import styles from "./PracticeTabs.module.css";
 
 type PracticeTabsProps = {
   readonly activeMode: PracticeMode;
+  readonly disabled: boolean;
   readonly onModeChange: (mode: PracticeMode) => void;
 };
 
-export function PracticeTabs({ activeMode, onModeChange }: PracticeTabsProps) {
+export function PracticeTabs({ activeMode, disabled, onModeChange }: PracticeTabsProps) {
   return (
     <div className={styles.practiceTabs}>
       <p>How would you like to practice?</p>
       <div role="tablist" aria-label="Practice modes">
         {PRACTICE_MODES.map((mode) => (
           <button
-            aria-selected={mode.id === activeMode}
-            className={mode.id === activeMode ? styles.active : undefined}
+            aria-selected={!disabled && mode.id === activeMode}
+            className={!disabled && mode.id === activeMode ? styles.active : undefined}
+            disabled={disabled || (activeMode === "mock" && mode.id !== "mock")}
             key={mode.id}
             onClick={() => onModeChange(mode.id)}
             role="tab"

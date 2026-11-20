@@ -1,7 +1,7 @@
 export type WordContext = {
   text: string;
-  kind: "sentence" | "definition";
   fromDictionary?: true;
+  adapted?: true;
 };
 
 export type WordContexts = ReadonlyMap<string, WordContext | null>;
@@ -29,7 +29,6 @@ export function builtInSentenceFor(word: string) {
 
 export function wordContextFor(word: string, contexts?: WordContexts): WordContext {
   return contexts?.get(normalizeWord(word)) ?? {
-    kind: "sentence",
     text: builtInSentenceFor(word) ?? `The teacher asked us to spell "${word.trim()}".`,
   };
 }
@@ -45,6 +44,5 @@ export function wordPattern(word: string) {
 }
 
 export function blankSentenceFor(word: string, context: WordContext) {
-  const text = context.text.replace(wordPattern(word), "_____");
-  return context.kind === "definition" ? `_____ means: ${text}` : text;
+  return context.text.replace(wordPattern(word), "_____");
 }

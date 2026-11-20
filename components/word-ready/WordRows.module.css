@@ -1,18 +1,26 @@
 .wordList {
+  container-type: inline-size;
   display: flex;
   max-height: 738px;
   flex-direction: column;
   gap: 18px;
   overflow-y: auto;
-  margin-top: 20px;
+  margin-top: 18px;
   padding: 0 18px 2px 0;
 }
 
+.blurredWord {
+  display: inline-block;
+  max-width: 100%;
+  filter: blur(4px);
+  user-select: none;
+}
+
 .wordRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 211px 158px;
   min-height: 105px;
   align-items: center;
-  justify-content: space-between;
   gap: 20px;
   border: 1px solid #ececec;
   border-radius: 12px;
@@ -31,6 +39,14 @@
 
 .wordRowCopy {
   min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wordHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .wordChip {
@@ -38,12 +54,14 @@
   align-items: center;
   justify-content: center;
   min-width: 109px;
-  height: 31px;
+  min-height: 31px;
+  max-width: 100%;
   border-radius: 10px;
-  padding: 0 18px;
+  padding: 3px 14px;
   background: #d9e8ff;
   color: #0067ff;
   font-size: 16px;
+  text-align: center;
 }
 
 .wordRowCopy p {
@@ -55,11 +73,10 @@
 }
 
 .wordRowActions {
-  display: flex;
-  min-width: 158px;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 14px;
+  display: grid;
+  grid-template-rows: 17px 39px;
+  justify-items: end;
+  gap: 5px;
 }
 
 .wordRowActions > span {
@@ -74,6 +91,85 @@
   gap: 8px;
 }
 
+.answerForm {
+  display: grid;
+  grid-template-rows: 17px 39px;
+  min-width: 0;
+  gap: 5px;
+}
+
+.answerForm label {
+  font-size: 13px;
+  line-height: 17px;
+  color: #555e6e;
+}
+
+.answerControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19px 58px;
+  align-items: center;
+  gap: 6px;
+}
+
+.answerControls input,
+.answerControls button {
+  min-width: 0;
+  height: 39px;
+  border: 1px solid #d5dae3;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.answerControls input {
+  width: 100%;
+  padding: 0 9px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.answerControls button {
+  padding: 0;
+  border-color: #1f66e5;
+  background: #1f66e5;
+  color: #ffffff;
+}
+
+.answerControls button:disabled {
+  border-color: #e1e5eb;
+  background: #f3f5f8;
+  color: #606a79;
+}
+
+.answerResult {
+  position: relative;
+  display: inline-grid;
+  width: 19px;
+  height: 19px;
+  place-items: center;
+}
+
+.answerResult[data-status="correct"] {
+  color: #217a3a;
+}
+
+.answerResult[data-status="missed"] {
+  color: #a13b26;
+}
+
+.screenReaderText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.answerControls input[aria-invalid="true"] {
+  border-color: #bb5b45;
+}
+
+.speakerButton,
 .masteredButton,
 .trickyButton {
   display: inline-flex;
@@ -85,6 +181,18 @@
   background: #ffffff;
   color: #111827;
   box-shadow: 0 3px 3px rgba(17, 24, 39, 0.17);
+}
+
+.speakerButton {
+  width: 38px;
+  height: 36px;
+  color: #2f5f9f;
+}
+
+.speakerButton:hover,
+.speakerButton[data-speaking="true"] {
+  border-color: #a4c4ef;
+  background: #edf5ff;
 }
 
 .masteredButton {
@@ -124,16 +232,24 @@
   fill: #e0a316;
 }
 
-@media (max-width: 650px) {
+@container (max-width: 680px) {
   .wordRow {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr) 158px;
+    row-gap: 12px;
+  }
+
+  .wordRowCopy {
+    grid-column: 1 / -1;
+  }
+}
+
+@container (max-width: 420px) {
+  .wordRow {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .wordRowActions {
-    width: 100%;
-    min-width: 0;
-    align-items: flex-start;
+    justify-items: start;
   }
 }
 

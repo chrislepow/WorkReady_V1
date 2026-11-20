@@ -1,4 +1,4 @@
-import { CheckCircle2, ClipboardCheck, RotateCcw, XCircle } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, XCircle } from "lucide-react";
 
 import { FeedbackStatus, PracticeItem, PracticeMode } from "@/lib/wordready";
 
@@ -10,7 +10,6 @@ type PracticeDrillProps = {
   readonly items: PracticeItem[];
   readonly mode: PracticeMode;
   readonly onGrade: () => void;
-  readonly onReset: () => void;
   readonly onUpdateAnswer: (id: string, value: string) => void;
 };
 
@@ -20,7 +19,6 @@ export function PracticeDrill({
   items,
   mode,
   onGrade,
-  onReset,
   onUpdateAnswer,
 }: PracticeDrillProps) {
   const isMock = mode === "mock";
@@ -28,10 +26,6 @@ export function PracticeDrill({
   return (
     <div className={styles.practiceDrill}>
       <div className={styles.drillToolbar}>
-        <button className={styles.secondaryAction} onClick={onReset} type="button">
-          <RotateCcw aria-hidden="true" size={17} />
-          Reset
-        </button>
         <button className={styles.primaryAction} onClick={onGrade} type="button">
           <ClipboardCheck aria-hidden="true" size={17} />
           {isMock ? "Grade Test" : "Check Answers"}

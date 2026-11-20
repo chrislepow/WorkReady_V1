@@ -9,8 +9,7 @@
   margin-bottom: 16px;
 }
 
-.primaryAction,
-.secondaryAction {
+.primaryAction {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,19 +18,10 @@
   border-radius: 5px;
   padding: 0 14px;
   font-size: 15px;
-}
-
-.primaryAction {
   border: 0;
   background: #1f66e5;
   color: #ffffff;
   box-shadow: 0 3px 5px rgba(17, 24, 39, 0.2);
-}
-
-.secondaryAction {
-  border: 1px solid #e3e6eb;
-  background: #ffffff;
-  color: #111827;
 }
 
 .drillList {

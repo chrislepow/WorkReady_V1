@@ -1,4 +1,5 @@
-import { BookOpen, CalendarDays, ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { BookOpen, CalendarDays, ChevronDown, ChevronUp, Minus, Plus, UserRound } from "lucide-react";
+import type { ChangeEvent } from "react";
 
 import { MAX_DAYS, MIN_DAYS, PlanItem } from "@/lib/wordready";
 
@@ -6,20 +7,26 @@ import styles from "./BrandPanel.module.css";
 
 type BrandPanelProps = {
   readonly daysUntilTest: number;
+  readonly hasRejectedWords: boolean;
+  readonly name: string;
   readonly plan: PlanItem[];
   readonly wordText: string;
   readonly onClearWords: () => void;
   readonly onDaysChange: (days: number) => void;
+  readonly onNameChange: (name: string) => void;
   readonly onWordEntryFocusChange: (focused: boolean) => void;
-  readonly onWordTextChange: (text: string) => void;
+  readonly onWordTextChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
 export function BrandPanel({
   daysUntilTest,
+  hasRejectedWords,
+  name,
   plan,
   wordText,
   onClearWords,
   onDaysChange,
+  onNameChange,
   onWordEntryFocusChange,
   onWordTextChange,
 }: BrandPanelProps) {
@@ -32,6 +39,23 @@ export function BrandPanel({
         <div className={styles.brandReady}>READY</div>
         <div className={styles.brandRule} />
         <p>Learn to spell words in less than a week</p>
+      </div>
+
+      <div className={styles.sidebarSection}>
+        <label className={styles.nameLabel} htmlFor="learner-name">
+          <UserRound aria-hidden="true" size={23} />
+          Name
+        </label>
+        <input
+          autoComplete="given-name"
+          className={styles.nameInput}
+          id="learner-name"
+          onChange={(event) => onNameChange(event.target.value)}
+          placeholder="Enter your name"
+          required
+          type="text"
+          value={name}
+        />
       </div>
 
       <section className={styles.sidebarSection}>
@@ -76,15 +100,21 @@ export function BrandPanel({
           Class Words
         </h2>
         <textarea
+          aria-describedby={hasRejectedWords ? "class-words-warning" : undefined}
           aria-label="Class words"
           className={styles.wordEntry}
           onBlur={() => onWordEntryFocusChange(false)}
-          onChange={(event) => onWordTextChange(event.target.value)}
+          onChange={onWordTextChange}
           onFocus={() => onWordEntryFocusChange(true)}
           placeholder="Start typing your words..."
           spellCheck={false}
           value={wordText}
         />
+        {hasRejectedWords && (
+          <p className={styles.wordEntryWarning} id="class-words-warning" role="status">
+            Profanity, numbers, and symbols are blocked. Enter words separated by commas or new lines.
+          </p>
+        )}
         <button className={styles.clearButton} onClick={onClearWords} type="button">
           Clear
         </button>

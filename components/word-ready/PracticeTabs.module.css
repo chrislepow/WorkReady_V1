@@ -43,6 +43,12 @@
   background: #f1f6fd;
 }
 
+.practiceTabs button:disabled {
+  background: #f3f5f8;
+  color: #697283;
+  box-shadow: none;
+}
+
 @media (max-width: 650px) {
   .practiceTabs {
     flex-direction: column;
